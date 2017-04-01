@@ -2,23 +2,27 @@ var crypto = require('crypto'); // cryptographic functionality (md5)
 var through = require('through2'); // a thin wrapper around node transform streams
 var gutil = require('gulp-util'); // utilities for gulp plugins
 var path = require('path');
-const PLUGIN_NAME = 'gulp-hash-file';
+var fs = require('fs');
+var PLUGIN_NAME = 'gulp-hash-file';
 
-// Calculate m5d hash
-function calcMd5(data) {
+function calcMd5(data, length) {
     var cripter = crypto.createHash('md5');
     var md5 = cripter.update(data).digest('hex');
-
-    return md5;
+    return md5.slice(0, length);
 }
 
-// Plugin level function (dealing with files)
-module.exports = function () {
-    // Creating a stream through which each file will pass
+module.exports = function (options) {
 
     var filesMd5 = {};
 
-    const stream = through.obj(function (file, enc, cb) {
+    options = Object.assign({
+        hashLength: 32,
+        fileName: '[name].[hash].[ext]',
+        cacheFileName: false,
+        globalName: 'FILES_HASH'
+    }, options);
+
+    var stream = through.obj(function (file, enc, cb) {
         if (file.isNull()) {
             return cb(null, file);
         }
@@ -28,32 +32,28 @@ module.exports = function () {
             return cb(null, file);
         }
 
-        filesMd5[file.relative] = calcMd5(file.contents);
-        //var data = '{"md5":"' + calcMd5(file.contents) + '","value":' + stringifiedFile + '}';
+        var fileMd5 = calcMd5(file.contents, options.hashLength);
+        filesMd5[file.relative] = fileMd5;
 
-        /* file.contents = new Buffer(data);
-         if (file.path) {
-             file.path = gutil.replaceExtension(file.path, '.json');
-         }*/
-
-        var fileInfo = path.parse(file.path);
-
-        if (file.path[0] == '.') {
-            dir = path.join(file.base, file.path);
-        } else {
-            dir = file.path;
+        if (options.fileName) {
+            var fileInfo = path.parse(file.path);
+            if (file.path[0] == '.') {
+                dir = path.join(file.base, file.path);
+            } else {
+                dir = file.path;
+            }
+            dir = path.dirname(dir);
+            file.path = path.join(dir, options.fileName.replace(/\[name\]/, fileInfo.name).replace(/\[hash\]/, fileMd5).replace(/\[ext\]/, fileInfo.ext));
         }
-        dir = path.dirname(dir);
-
-        //console.dir(fileInfo);
-
-        file.path = path.join(dir, fileInfo.name + '.' + filesMd5[file.relative] + fileInfo.ext);
-        //  this.push(file);
-
         cb(null, file);
     });
     stream.on('finish', () => {
-        //fs.writeFileSync(cacheName, JSON.stringify(cache, null, 2));
+        if (options.cacheFileName) {
+            fs.writeFileSync(options.cacheFileName, JSON.stringify(filesMd5, null, 2));
+        }
+        if (options.globalName) {
+            global[options.globalName] = filesMd5;
+        }
     });
     return stream;
 };

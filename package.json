@@ -1,6 +1,6 @@
 {
   "name": "gulp-hash-file",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "gulp plugin",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,11 @@
     "type": "git",
     "url": "git+https://github.com/qinshenxue/gulp-hash-file.git"
   },
-  "keywords": [],
+  "keywords": [
+    "gulp",
+    "gulp hash",
+    "gulpplugin"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {

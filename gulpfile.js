@@ -4,7 +4,10 @@ var hashfile = require('./index.js');
 
 // Generate example.css.md5 (from "md5" value in example.json)
 gulp.task('default', function () {
-   gulp.src('./example/index.js')
-    .pipe(hashfile())
-    .pipe(gulp.dest('./example1/'));
+    gulp.src('./example/index.js')
+        .pipe(hashfile({
+            hashLength: 8,
+            cacheFileName:'.hash.json'
+        }))
+        .pipe(gulp.dest('example'));
 });
