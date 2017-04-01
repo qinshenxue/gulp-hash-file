@@ -18,8 +18,7 @@ module.exports = function (options) {
     options = Object.assign({
         hashLength: 32,
         fileName: '[name].[hash].[ext]',
-        cacheFileName: false,
-        globalName: 'FILES_HASH'
+        cacheFileName: false
     }, options);
 
     var stream = through.obj(function (file, enc, cb) {
@@ -43,16 +42,13 @@ module.exports = function (options) {
                 dir = file.path;
             }
             dir = path.dirname(dir);
-            file.path = path.join(dir, options.fileName.replace(/\[name\]/, fileInfo.name).replace(/\[hash\]/, fileMd5).replace(/\[ext\]/, fileInfo.ext));
+            file.path = path.join(dir, options.fileName.replace(/\[name\]/, fileInfo.name).replace(/\[hash\]/, fileMd5).replace(/\[ext\]/, fileInfo.ext.slice(1)));
         }
         cb(null, file);
     });
     stream.on('finish', () => {
         if (options.cacheFileName) {
             fs.writeFileSync(options.cacheFileName, JSON.stringify(filesMd5, null, 2));
-        }
-        if (options.globalName) {
-            global[options.globalName] = filesMd5;
         }
     });
     return stream;

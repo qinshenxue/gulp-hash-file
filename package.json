@@ -1,11 +1,11 @@
 {
   "name": "gulp-hash-file",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "gulp plugin",
   "main": "index.js",
   "scripts": {
-    "start":"gulp",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "gulp",
+    "test": "mocha -R spec ./test/*.js"
   },
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
   },
   "keywords": [
     "gulp",
-    "gulp hash",
+    "md5",
     "gulpplugin"
   ],
   "author": "",
@@ -27,6 +27,8 @@
     "through2": "^2.0.3"
   },
   "devDependencies": {
-    "gulp":"latest"
+    "gulp": "latest",
+    "mocha": "^3.2.0",
+    "vinyl": "^2.0.1"
   }
 }

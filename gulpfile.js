@@ -7,7 +7,7 @@ gulp.task('default', function () {
     gulp.src('./example/index.js')
         .pipe(hashfile({
             hashLength: 8,
-            cacheFileName:'.hash.json'
+            cacheFileName:'./example/hash.json'
         }))
         .pipe(gulp.dest('example'));
 });
